@@ -28,6 +28,8 @@ jobs:
 
       - name: Test with Maven
         run: mvn test
-      - run: mkdir test-results && cp target/*-reports/TEST-*.xml test-results
+
+      - name: Copying test results
+        run: mkdir test-results && cp target/*-reports/TEST-*.xml test-results
 
       
