@@ -26,4 +26,8 @@ jobs:
       - name: Build project using Maven
         run: mvn clean install
 
+      - name: Test with Maven
+        run: mvn test
+      - run: mkdir test-results && cp target/*-reports/TEST-*.xml test-results
+
       
