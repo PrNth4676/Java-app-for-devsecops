@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: CodeQL SAST Scan
+    name: Build Java application
     runs-on: ubuntu-latest
 
     steps:
