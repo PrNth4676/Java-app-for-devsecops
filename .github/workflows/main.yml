@@ -45,6 +45,26 @@ jobs:
           name: Test-Results
           path: test-results
 
+      - name: Setup CodeQL
+        uses: github/codeql-action/setup-codeql@v2
+        with:
+          languages: java
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          categories: security-compatibility
+          output: results.sarif
+
+      - name: Upload CodeQL Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: CodeQL Results
+          path: results.sarif
+
 
 
       
