@@ -13,6 +13,11 @@ jobs:
     name: Build Java application
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['java']
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -45,25 +50,18 @@ jobs:
           name: Test-Results
           path: test-results
 
-      - name: Setup CodeQL
-        uses: github/codeql-action/setup-codeql@v2
-        with:
-          languages: java
-      
+      # CodeQL Analysis Steps
       - name: Initialize CodeQL
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
 
-      - name: Run CodeQL Analysis
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
-          categories: security-compatibility
-          output: results.sarif
-
-      - name: Upload CodeQL Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: CodeQL Results
-          path: results.sarif
+          category: "/language:${{ matrix.language }}"
+        
+      
 
 
 
