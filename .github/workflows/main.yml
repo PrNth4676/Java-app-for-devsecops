@@ -33,6 +33,18 @@ jobs:
       - name: Copying test results
         run: mkdir test-results && cp target/*-reports/TEST-*.xml test-results
 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Application-Binary
+          path: candidate-binary
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test-Results
+          path: test-results
+
 
 
       
