@@ -1,13 +1,3 @@
-name: CodeQL SAST Scan
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  schedule:
-    - cron: '0 0 * * 1'  # Run weekly
-
 jobs:
   SAST-CodeQL:
     name: Build, Test, and SAST CodeQL
@@ -57,13 +47,14 @@ jobs:
           name: Test-Results
           path: test-results
 
-      # Initialize CodeQL tools for scanning
+      - name: Cleanup CodeQL database
+        run: rm -rf ${{ github.workspace }}/codeql-database
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
 
-      # Perform CodeQL Analysis
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
