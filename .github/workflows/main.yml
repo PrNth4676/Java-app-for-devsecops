@@ -118,8 +118,9 @@ jobs:
     name: Build Docker image
     env:
       REGISTRY: ghcr.io
+      REPO_NAME: ${{ github.repository }}
     outputs:
-      image-tag: ${{ steps.build.outputs.image_tag }}
+      image-tag: ${{ steps.meta.outputs.tags }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -137,17 +138,20 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Convert repository name to lowercase
-      id: lowercase
-      run: echo "REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+    - name: Extract metadata for Docker
+      id: meta
+      uses: docker/metadata-action@v4.1.0
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.REPO_NAME | toLower }}
+        tags: type=semver,pattern={{version}}
 
     - name: Build and push Docker image
-      id: build
       uses: docker/build-push-action@v3.2.0
       with:
         context: .
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
+        tags: ${{ steps.meta.outputs.tags }}
+
 
       
   container-image-scan:
@@ -156,6 +160,7 @@ jobs:
     name: Scan Docker image
     env:
       REGISTRY: ghcr.io
+      REPO_NAME: ${{ github.repository }}
       IMAGE_TAG: ${{ needs.docker.outputs.image-tag }}
     steps:
     - name: Log in to the Container registry
@@ -166,12 +171,12 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Pull Docker image
-      run: docker pull ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
+      run: docker pull ${{ env.REGISTRY }}/${{ env.REPO_NAME | toLower }}:latest
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.7.1
       with:
-        image-ref: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
+        image-ref: ${{ env.REGISTRY }}/${{ env.REPO_NAME | toLower }}:latest
         format: 'template'
         template: '@/contrib/sarif.tpl'
         output: 'trivy-results.sarif'
@@ -181,6 +186,7 @@ jobs:
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
+
 
  
 
