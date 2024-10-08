@@ -166,12 +166,12 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Pull Docker image
-      run: docker pull ${{ env.REGISTRY }}/{{ github.repository | toLower }}:latest
+      run: docker pull ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.7.1
       with:
-        image-ref: ${{ env.REGISTRY }}/{{ github.repository | toLower }}:latest
+        image-ref: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
         format: 'template'
         template: '@/contrib/sarif.tpl'
         output: 'trivy-results.sarif'
