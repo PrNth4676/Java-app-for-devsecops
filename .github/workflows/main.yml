@@ -206,7 +206,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: docker rm demoApp | true && docker run -d -p 8080:5000 --name demoApp ${{ env.IMAGE_TAG }}
+      - run: docker rm demoApp | true && docker run -d -p 8080:8080 --name demoApp ${{ env.IMAGE_TAG }}
 
       - name: Wait for container to start
         run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
@@ -220,8 +220,8 @@ jobs:
           docker_name: 'zaproxy/zap-stable'
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://localhost:8080'
-          cmd_options: '-a -j -l WARN -z "-addoninstallall" '
-          allow_issue_writing: false
+          #cmd_options: '-a -j -l WARN -z "-addoninstallall" '
+          #allow_issue_writing: false
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v3
