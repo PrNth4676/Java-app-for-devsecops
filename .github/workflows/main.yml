@@ -13,6 +13,11 @@ jobs:
   build:
     name: Build Java application
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['java']
     
     steps:
       - name: Checkout repository
