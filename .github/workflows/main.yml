@@ -220,8 +220,7 @@ jobs:
           docker_name: 'zaproxy/zap-stable'
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://localhost:8080'
-          #cmd_options: '-a -j -l WARN -z "-addoninstallall" '
-          #allow_issue_writing: false
+          allow_issue_writing: false
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v3
