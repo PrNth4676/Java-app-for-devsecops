@@ -118,9 +118,8 @@ jobs:
     name: Build Docker image
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository | toLower }}
     outputs:
-      image-tag: ${{ steps.meta.outputs.image }}
+      image-tag: ${{ steps.build.outputs.image_tag }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -140,14 +139,15 @@ jobs:
 
     - name: Convert repository name to lowercase
       id: lowercase
-      run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      run: echo "REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
     - name: Build and push Docker image
+      id: build
       uses: docker/build-push-action@v3.2.0
       with:
         context: .
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        tags: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
 
       
   container-image-scan:
@@ -166,12 +166,12 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Pull Docker image
-      run: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+      run: docker pull ${{ env.REGISTRY }}/{{ github.repository | toLower }}:latest
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.7.1
       with:
-        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        image-ref: ${{ env.REGISTRY }}/{{ github.repository | toLower }}:latest
         format: 'template'
         template: '@/contrib/sarif.tpl'
         output: 'trivy-results.sarif'
@@ -181,6 +181,7 @@ jobs:
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
+
  
 
   dast-scan:
